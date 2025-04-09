@@ -1,56 +1,69 @@
 #include "../include/HashTable.h"
-#include <cassert>
 #include <iostream>
-#include <unordered_set>
 
 void testBasicOperations() {
+    std::cout << "Running basic operations test... ";
     HashTable ht;
-    assert(ht.insert("apple"));
-    assert(ht.contains("apple"));
-    assert(!ht.contains("banana"));
-    assert(!ht.insert("apple")); // Duplicate
+    bool allPassed = true;
+    
+    // Test insert and contains
+    allPassed &= ht.insert("apple");
+    allPassed &= ht.contains("apple");
+    allPassed &= !ht.contains("banana");
+    allPassed &= !ht.insert("apple"); // Duplicate
     
     const std::vector<std::string> fruits = {"banana", "cherry", "date"};
     for (const auto& fruit : fruits) {
-        assert(ht.insert(fruit));
+        allPassed &= ht.insert(fruit);
     }
     for (const auto& fruit : fruits) {
-        assert(ht.contains(fruit));
+        allPassed &= ht.contains(fruit);
     }
-    std::cout << "✓ Basic operations passed\n";
+    
+    std::cout << (allPassed ? "PASSED" : "FAILED") << "\n";
 }
 
 void testResizing() {
+    std::cout << "Running resizing test... ";
+    bool allPassed = true;
+    
     HashTable htDouble(16, 0.75f, HashTable::ResizeStrategy::Double);
-    for (int i = 0; i < 12; ++i) { // 16 * 0.75 = 12
-        assert(htDouble.insert(std::to_string(i)));
+    for (int i = 0; i < 12; ++i) {
+        allPassed &= htDouble.insert(std::to_string(i));
     }
-    assert(htDouble.capacity() == 32);
+    allPassed &= (htDouble.capacity() == 32);
     
     HashTable htAdd(16, 0.75f, HashTable::ResizeStrategy::Add10000);
     for (int i = 0; i < 12; ++i) {
-        assert(htAdd.insert(std::to_string(i)));
+        allPassed &= htAdd.insert(std::to_string(i));
     }
-    assert(htAdd.capacity() == 10016);
-    std::cout << "✓ Resizing tests passed\n";
+    allPassed &= (htAdd.capacity() == 10016);
+    
+    std::cout << (allPassed ? "PASSED" : "FAILED") << "\n";
 }
 
 void testLargeDataset() {
+    std::cout << "Running large dataset test... ";
+    bool allPassed = true;
+    
     HashTable ht;
-    std::unordered_set<std::string> reference;
     for (int i = 0; i < 1000; ++i) {
-        std::string val = "item_" + std::to_string(i);
-        assert(ht.insert(val));
-        reference.insert(val);
+        allPassed &= ht.insert("item_" + std::to_string(i));
     }
-    for (const auto& val : reference) {
-        assert(ht.contains(val));
+    for (int i = 0; i < 1000; ++i) {
+        allPassed &= ht.contains("item_" + std::to_string(i));
     }
-    std::cout << "✓ Large dataset test passed\n";
+    for (int i = 1000; i < 1100; ++i) {
+        allPassed &= !ht.contains("item_" + std::to_string(i));
+    }
+    
+    std::cout << (allPassed ? "PASSED" : "FAILED") << "\n";
 }
 
 void runAllTests() {
+    std::cout << "\n=== Running Tests ===\n";
     testBasicOperations();
     testResizing();
     testLargeDataset();
+    std::cout << "=== Tests Complete ===\n\n";
 }
