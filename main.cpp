@@ -1,25 +1,89 @@
 #include <iostream>
-#include "HashTable.h"
-#include "utilities.h"
+#include <string>
+#include "HashTable.hpp"
 
-void runAllTests();
+using namespace std;
+
+void test1() {
+    HashTable ht(10, 0.75, 1);
+    vector<string> strings = {"apple", "banana", "cherry", "date", "elderberry"};
+    for (auto& s : strings) {
+        ht.insert(s);
+    }
+    for (auto& s : strings) {
+        if (!ht.find(s)) {
+            cout << "Test 1 failed: " << s << " not found." << endl;
+            return;
+        }
+    }
+    vector<string> notPresent = {"fig", "grape", "honeydew", "kiwi", "lemon"};
+    for (auto& s : notPresent) {
+        if (ht.find(s)) {
+            cout << "Test 1 failed: " << s << " incorrectly found." << endl;
+            return;
+        }
+    }
+    cout << "Test 1 passed." << endl;
+}
+
+void test2() {
+    HashTable ht(16, 0.75, 1);
+    for (int i = 0; i < 23; ++i) {
+        ht.insert(to_string(i));
+    }
+    if (ht.getResizeCount() != 1) {
+        cout << "Test 2 failed: resize count " << ht.getResizeCount() << ", expected 1." << endl;
+        return;
+    }
+    for (int i = 0; i < 23; ++i) {
+        if (!ht.find(to_string(i))) {
+            cout << "Test 2 failed: " << i << " not found." << endl;
+            return;
+        }
+    }
+    cout << "Test 2 passed." << endl;
+}
+
+void test3() {
+    HashTable ht(16, 0.75, 1);
+    for (int i = 0; i < 24; ++i) {
+        ht.insert(to_string(i));
+    }
+    if (ht.getResizeCount() != 2) {
+        cout << "Test 3 failed: resize count " << ht.getResizeCount() << ", expected 2." << endl;
+        return;
+    }
+    for (int i = 0; i < 24; ++i) {
+        if (!ht.find(to_string(i))) {
+            cout << "Test 3 failed: " << i << " not found." << endl;
+            return;
+        }
+    }
+    cout << "Test 3 passed." << endl;
+}
+
+void test4() {
+    HashTable ht(16, 0.75, 2);
+    for (int i = 0; i < 24; ++i) {
+        ht.insert(to_string(i));
+    }
+    if (ht.getResizeCount() != 1) {
+        cout << "Test 4 failed: resize count " << ht.getResizeCount() << ", expected 1." << endl;
+        return;
+    }
+    for (int i = 0; i < 24; ++i) {
+        if (!ht.find(to_string(i))) {
+            cout << "Test 4 failed: " << i << " not found." << endl;
+            return;
+        }
+    }
+    cout << "Test 4 passed." << endl;
+}
 
 int main() {
-    try {
-        runAllTests();
-        
-        std::cout << "Starting performance measurements...\n";
-        auto data = HashTableUtils::generateTestData();
-        HashTableUtils::measurePerformance(data);
-        HashTableUtils::analyzeLoadFactorPerformance(65536, data);
-        
-        std::cout << "\nAll operations completed successfully!\n";
-        std::cout << "1. View timing data in data/timing_results.csv\n";
-        std::cout << "2. View load factor data in data/load_factor_results.csv\n";
-        std::cout << "3. Run 'python scripts/graph_generator.py' to generate plots\n";
-    } catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() << "\n";
-        return 1;
-    }
+    test1();
+    test2();
+    test3();
+    test4();
     return 0;
 }
